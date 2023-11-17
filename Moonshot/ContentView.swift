@@ -7,15 +7,41 @@
 
 import SwiftUI
 
+enum Layout {
+    case grid, list
+}
+
+extension Layout {
+    func toggle() -> Self {
+        self == .grid ? .list : .grid
+    }
+}
+
 struct ContentView: View {
+    let astronauts: [String: Astronaut] = Bundle.main.decode("astronauts.json")
+    let missions: [Mission] = Bundle.main.decode("missions.json")
+
+    @State private var layout = Layout.grid
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            ScrollView {
+                switch layout {
+                case .grid:
+                    GridView(astronauts: astronauts, missions: missions)
+                case .list:
+                    ListView(astronauts: astronauts, missions: missions)
+                }
+            }
+            .navigationTitle("Moonshot")
+            .background(.darkBackground)
+            .preferredColorScheme(.dark)
+            .toolbar {
+                Button(layout == .grid ? "List" : "Grid") {
+                    layout = layout.toggle()
+                }
+            }
         }
-        .padding()
     }
 }
 
